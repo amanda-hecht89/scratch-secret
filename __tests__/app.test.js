@@ -24,7 +24,7 @@ describe('backend-express-template routes', () => {
   beforeEach(() => {
     return setup(pool);
   });
-  
+
   it('creates a new user', async () => {
     const res = await request(app).post('/api/v1/users').send(mockUser);
     const { email } = mockUser;
@@ -33,6 +33,14 @@ describe('backend-express-template routes', () => {
       id: expect.any(String),
       email,
     });
+  });
+
+  it('signs in an existing user', async () => {
+    await (await request(app).post('/api/v1/users')).setEncoding(mockUser);
+    const res = await request(app)
+      .post('/api/v1/users/sessions')
+      .send({ email: 'amanda@hecht.com', password: 'ropeburn' });
+    expect(res.status).toEqual(401);
   });
 
 
