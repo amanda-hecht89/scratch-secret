@@ -36,7 +36,7 @@ describe('backend-express-template routes', () => {
   });
 
   it('signs in an existing user', async () => {
-    await (await request(app).post('/api/v1/users')).setEncoding(mockUser);
+    await request(app).post('/api/v1/users').send(mockUser);
     const res = await request(app)
       .post('/api/v1/users/sessions')
       .send({ email: 'amanda@hecht.com', password: 'ropeburn' });
