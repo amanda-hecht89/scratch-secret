@@ -3,6 +3,7 @@ const setup = require('../data/setup');
 const request = require('supertest');
 const app = require('../lib/app');
 const UserService = require('../lib/services/UserService');
+const agent = request.agent(app);
 
 const mockUser = {
   email: 'amanda@hecht.com',
@@ -18,13 +19,10 @@ const registerAndLogin = async (userProps = {}) => {
   await agent.post('/apr/v1/users/sessions').send({ email, password });
   return [agent, user];
 };
-
-
 describe('backend-express-template routes', () => {
   beforeEach(() => {
     return setup(pool);
   });
-
   it('creates a new user', async () => {
     const res = await request(app).post('/api/v1/users').send(mockUser);
     const { email } = mockUser;
@@ -34,30 +32,20 @@ describe('backend-express-template routes', () => {
       email,
     });
   });
-
   it('signs in an existing user', async () => {
     await request(app).post('/api/v1/users').send(mockUser);
     const res = await request(app)
       .post('/api/v1/users/sessions')
       .send({ email: 'amanda@hecht.com', password: 'ropeburn' });
-    expect(res.status).toEqual(401);
+    expect(res.status).toEqual(200);
   });
-
+  
   it('DELETE /sessions deletes the user session', async () => {
     const [agent] = await registerAndLogin();
     const res = await agent.delete('/api/v1/users/sessions');
     expect(res.status).toBe(204);
   });
-  it('/get secrets should return secrets for authenticated users', async () => {
-    const [agent] = await registerAndLogin();
-    const res = await agent.get('/api/v1/secrets');
-    expect(res.status).toBe(200);
-  });
-
-  
-
-
-
+ 
   afterAll(() => {
     pool.end();
   });
