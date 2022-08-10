@@ -48,6 +48,11 @@ describe('backend-express-template routes', () => {
     const res = await agent.delete('/api/v1/users/sessions');
     expect(res.status).toBe(204);
   });
+  it('/get secrets should return secrets for authenticated users', async () => {
+    const [agent] = await registerAndLogin();
+    const res = await agent.get('/api/v1/secrets');
+    expect(res.status).toBe(200);
+  });
 
   
 
