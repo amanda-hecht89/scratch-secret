@@ -15,7 +15,7 @@ const registerAndLogin = async (userProps = {}) => {
   const agent = request.agent(app);
   const user = await UserService.create({ ...mockUser, ...userProps });
   const { email } = user;
-  await (await agent.post('/apr/v1/users/sessions')).setEncoding({ email, password });
+  await agent.post('/apr/v1/users/sessions').send({ email, password });
   return [agent, user];
 };
 
@@ -43,7 +43,7 @@ describe('backend-express-template routes', () => {
     expect(res.status).toEqual(401);
   });
 
-  it('DELETE /sessions deletes the user session', async () => {
+  it.only('DELETE /sessions deletes the user session', async () => {
     const [agent] = await registerAndLogin();
     const res = await agent.delete('/api/v1/users/sessions');
     expect(res.status).toBe(204);
