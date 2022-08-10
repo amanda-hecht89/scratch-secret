@@ -16,36 +16,18 @@ const registerAndLogin = async (userProps = {}) => {
   const agent = request.agent(app);
   const user = await UserService.create({ ...mockUser, ...userProps });
   const { email } = user;
-  await agent.post('/apr/v1/users/sessions').send({ email, password });
+  await agent.post('/api/v1/users/sessions').send({ email, password });
   return [agent, user];
 };
 describe('backend-express-template routes', () => {
   beforeEach(() => {
     return setup(pool);
   });
-  it('creates a new user', async () => {
-    const res = await request(app).post('/api/v1/users').send(mockUser);
-    const { email } = mockUser;
-
-    expect(res.body).toEqual({
-      id: expect.any(String),
-      email,
-    });
-  });
-  it('signs in an existing user', async () => {
-    await request(app).post('/api/v1/users').send(mockUser);
-    const res = await request(app)
-      .post('/api/v1/users/sessions')
-      .send({ email: 'amanda@hecht.com', password: 'ropeburn' });
-    expect(res.status).toEqual(200);
-  });
-  
-  it('DELETE /sessions deletes the user session', async () => {
+  it('/get secrets should return secrets for authenticated users', async () => {
     const [agent] = await registerAndLogin();
-    const res = await agent.delete('/api/v1/users/sessions');
-    expect(res.status).toBe(204);
+    const res = await agent.get('/api/v1/secrets');
+    expect(res.status).toBe(200);
   });
- 
   afterAll(() => {
     pool.end();
   });
